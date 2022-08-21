@@ -30,13 +30,8 @@ jobs:
        sudo dpkg --add-architecture i386
        sudo dpkg-reconfigure dash
        sudo apt update
-       sudo apt update
-       sudo apt-get install libtool-bin cmake libproxy-dev uuid-dev liblzo2-dev autoconf automake bash bison \
-       bzip2 diffutils file flex m4 g++ gawk groff-base libncurses5-dev libtool libslang2 make patch perl pkg-config shtool \
-       subversion tar texinfo zlib1g zlib1g-dev git gettext libexpat1-dev libssl-dev cvs gperf unzip \
-       python libxml-parser-perl gcc-multilib gconf-editor libxml2-dev g++-multilib gitk libncurses5 mtd-utils \
-       libncurses5-dev libvorbis-dev git autopoint autogen automake-1.15 sed build-essential intltool libglib2.0-dev \
-       xutils-dev lib32z1-dev lib32stdc++6 xsltproc gtk-doc-tools libelf1:i386
+       sudo apt-get install libtool-bin cmake libproxy-dev uuid-dev liblzo2-dev autoconf automake bash bison bzip2 diffutils file flex m4 g++ gawk groff-base libncurses5-dev libtool libslang2 make patch perl pkg-config shtool subversion tar texinfo zlib1g zlib1g-dev git gettext libexpat1-dev libssl-dev cvs gperf unzip python libxml-parser-perl gcc-multilib gconf-editor libxml2-dev g++-multilib gitk libncurses5 mtd-utils libncurses5-dev libvorbis-dev git autopoint autogen automake-1.15 sed build-essential intltool libglib2.0-dev xutils-dev lib32z1-dev lib32stdc++6 xsltproc gtk-doc-tools libelf1:i386
+       
         
     - name: Clone source code
       run: |       
@@ -77,7 +72,7 @@ jobs:
         
     - name: Move file
       run: |
-        sudo mv -f ~/amng-build/release/src-rt-7.14.114.x/srcimage/*.trx /opt/images/
+        sudo mv -f ~/amng-build/release/src-rt-7.14.114.x/src/image/*.trx /opt/images/
         sudo cp ~/amng-build/release/src-rt-7.14.114.x/src/cfe/build/broadcom/bcm947xx/compressed/rt-k3_nvram.txt /opt/images/
         sudo cp ~/amng-build/release/src-rt-7.14.114.x/src/cfe/cfe*.bin /opt/images/
 
