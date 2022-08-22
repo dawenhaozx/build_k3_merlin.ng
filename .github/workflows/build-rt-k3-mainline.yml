@@ -51,8 +51,6 @@ jobs:
         git clone https://github.com/RMerl/am-toolchains.git
         sudo mkdir -p /opt/images/
         sudo mkdir -p /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/asuswrt-merlin.ng/release/src-rt-6.x.4708/toolchains
-    - name: SSH connection to Actions
-      uses: P3TERX/ssh2actions@v1.0.0
       
     - name: Link Directory
       run: |       
