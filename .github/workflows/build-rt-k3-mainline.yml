@@ -17,7 +17,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout
@@ -43,7 +43,9 @@ jobs:
        python libxml-parser-perl gcc-multilib gconf-editor libxml2-dev g++-multilib libncurses5 mtd-utils \
        libncurses5-dev libvorbis-dev git autopoint autogen automake-1.15 sed build-essential intltool libglib2.0-dev \
        xutils-dev lib32z1-dev lib32stdc++6 xsltproc gtk-doc-tools libelf1:i386
-        
+       
+       reboot
+
     - name: Clone source code
       run: | 
         cd $HOME
