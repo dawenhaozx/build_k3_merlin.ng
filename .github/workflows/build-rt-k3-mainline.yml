@@ -17,7 +17,7 @@ env:
 
 jobs:
   build:
-    runs-on: Ubuntu-20.04
+    runs-on: Ubuntu-22.04
 
     steps:
     - name: Checkout
@@ -29,8 +29,6 @@ jobs:
       run: |
        sudo dpkg --add-architecture i386
        sudo dpkg-reconfigure dash
-       sudo apt update -y
-       sudo apt full-upgrade -y
        sudo apt-get install libtool-bin cmake libproxy-dev uuid-dev liblzo2-dev autoconf automake bash bison \
        bzip2 diffutils file flex m4 g++ gawk groff-base libncurses5-dev libtool libslang2 make patch perl pkg-config shtool \
        subversion tar texinfo zlib1g zlib1g-dev git gettext libexpat1-dev libssl-dev cvs gperf unzip \
