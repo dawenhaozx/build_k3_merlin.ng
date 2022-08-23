@@ -10,7 +10,7 @@ on:
         default: 'false'
     
 env:
-  images_dir: /opt/images
+  images_dir: ~/images
   ET0MACADDR: "98:BB:99:2F:4B:37"    
   MACADDR1_24G: "98:BB:99:2F:4B:38"
   MACADDR2_5G: "98:BB:99:2F:4B:39"
@@ -45,46 +45,55 @@ jobs:
        xutils-dev lib32z1-dev lib32stdc++6 xsltproc gtk-doc-tools libelf1:i386
         
     - name: Clone source code
-      run: |       
+      run: | 
+        cd $HOME
         git clone https://github.com/dawenhaozx/asuswrt-merlin.ng
         git clone https://github.com/ghostnup/k3screenctrl asuswrt-merlin.ng/release/src/router/k3screenctrl 
         git clone https://github.com/RMerl/am-toolchains.git
-        sudo mkdir -p /opt/images/
-        sudo mkdir -p /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/asuswrt-merlin.ng/release/src-rt-6.x.4708/toolchains
+        mkdir amng-build
+        rsync -a --del asuswrt-merlin.ng/ amng-build
+        mkdir -p images
       
     - name: Link Directory
       run: |       
-       sudo ln -s /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/am-toolchains/brcm-arm-sdk/hndtools-arm-linux-2.6.36-uclibc-4.5.3 /opt/brcm-arm
-       ln -s /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/am-toolchains/brcm-arm-sdk  /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/asuswrt-merlin.ng/release/src-rt-6.x.4708/toolchains
-       echo "PATH=\$PATH:/opt/brcm-arm/bin" >> ~/.profile
+        sudo ln -s ~/am-toolchains/brcm-arm-hnd /opt/toolchains
+        echo "export LD_LIBRARY_PATH=\$LD_LIBRARY:/opt/toolchains/crosstools-arm-gcc-5.3-linux-4.1-glibc-2.22-binutils-2.25/usr/lib" >> ~/.profile
+        echo "export TOOLCHAIN_BASE=/opt/toolchains" >> ~/.profile
+        echo "PATH=\$PATH:/opt/toolchains/crosstools-arm-gcc-5.3-linux-4.1-glibc-2.22-binutils-2.25/usr/bin" >> ~/.profile
+        echo "PATH=\$PATH:/opt/toolchains/crosstools-aarch64-gcc-5.3-linux-4.1-glibc-2.22-binutils-2.25/usr/bin" >> ~/.profile
+        sudo ln -s ~/am-toolchains/brcm-arm-hnd /opt/toolchains
+        echo "export LD_LIBRARY_PATH=\$LD_LIBRARY:/opt/toolchains/crosstools-arm-gcc-5.5-linux-4.1-glibc-2.26-binutils-2.28.1/usr/lib" >> ~/.profile
+        echo "export TOOLCHAIN_BASE=/opt/toolchains" >> ~/.profile
+        echo "PATH=\$PATH:/opt/toolchains/crosstools-arm-gcc-5.5-linux-4.1-glibc-2.26-binutils-2.28.1/usr/bin" >> ~/.profile
+        echo "PATH=\$PATH:/opt/toolchains/crosstools-aarch64-gcc-5.5-linux-4.1-glibc-2.26-binutils-2.28.1/usr/bin" >> ~/.profile
+        sudo ln -s ~/amng-build/am-toolchains/brcm-arm-sdk/hndtools-arm-linux-2.6.36-uclibc-4.5.3 /opt/brcm-arm
+        ln -s ~/amng-build/am-toolchains/brcm-arm-sdk  ~/amng-build/release/src-rt-6.x.4708/toolchains
+        echo "PATH=\$PATH:/opt/brcm-arm/bin" >> ~/.profile
         
        
     - name: Modify File
       run: |        
-        cd  /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/asuswrt-merlin.ng/release/src-rt-7.14.114.x/src/cfe/build/broadcom/bcm947xx/compressed
-        echo "replace mac address from $(cat rt-k3_nvram.txt | grep ^et0macaddr) to ${{ env.ET0MACADDR }}"
+        cd  ~/amng-build/release/src-rt-7.14.114.x/src/cfe/build/broadcom/bcm947xx/compressed
         sed -i 's/^\(et0macaddr=\).*/\1${{ env.ET0MACADDR }}/g' rt-k3_nvram.txt
-        echo "replace mac 2.4g address from $(cat rt-k3_nvram.txt | grep ^1:macaddr) to ${{ env.MACADDR1_24G }}"
-        sed -i 's/^\(1:macaddr=\).*/\1${{ env.MACADDR1_24G }}/g' rt-k3_nvram.txt
-        echo "replace mac 5g address from $(cat rt-k3_nvram.txt | grep ^2:macaddr) to ${{ env.MACADDR2_5G }}"
-        sed -i 's/^\(2:macaddr=\).*/\1${{ env.MACADDR2_5G }}/g' rt-k3_nvram.txt
+        sed -i 's/^\(0:macaddr=\).*/\1${{ env.MACADDR1_24G }}/g' rt-k3_nvram.txt
+        sed -i 's/^\(1:macaddr=\).*/\1${{ env.MACADDR2_5G }}/g' rt-k3_nvram.txt
         
     - name: Build Firmware
       run: |
       
-        cd /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/asuswrt-merlin.ng/release/src-rt-7.14.114.x/src
+        cd ~/amng-build/release/src-rt-7.14.114.x/src
         make rt-k3
         echo "build image done"     
         
-        cd /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/asuswrt-merlin.ng/release/src-rt-7.14.114.x/src/cfe
+        cd ~/amng-build/release/src-rt-7.14.114.x/src/cfe
         make
         echo "build cfe done"
         
     - name: Move file
       run: |
-        sudo mv -f /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/asuswrt-merlin.ng/release/src-rt-7.14.114.x/src/image/*.trx /opt/images/
-        sudo cp /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/asuswrt-merlin.ng/release/src-rt-7.14.114.x/src/cfe/build/broadcom/bcm947xx/compressed/rt-k3_nvram.txt /opt/images/
-        sudo cp /home/runner/work/build_k3_merlin.ng/build_k3_merlin.ng/asuswrt-merlin.ng/release/src-rt-7.14.114.x/src/cfe/cfe*.bin /opt/images/
+        sudo mv -f ~/amng-build/release/src-rt-7.14.114.x/src/image/*.trx ~/images
+        cp ~/amng-build/release/src-rt-7.14.114.x/src/cfe/build/broadcom/bcm947xx/compressed/rt-k3_nvram.txt ~/images
+        cp ~/amng-build/release/src-rt-7.14.114.x/src/cfe/cfe*.bin ~/images
 
     - name: Upload images to Artifact
       if: ${{ success() }}
